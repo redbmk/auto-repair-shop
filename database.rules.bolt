@@ -1,0 +1,62 @@
+type User {
+  displayName: String,
+  photoURL: String,
+  uid: String,
+  repairs: String[],
+  isManager: Boolean,
+}
+
+type Comment {
+  validate() { root.users[this.user].exists() }
+
+  message: String,
+  datetime: Number,
+  user: String,
+}
+
+type Repair {
+  validate() { !this.user || root.users[this.user].exists() }
+
+  datetime: Number,
+  complete: Boolean,
+  approved: Boolean,
+  user: String,
+  comments: Comments[],
+}
+
+path /users {
+  read() { isManager() }
+}
+
+path /users/{uid} is User {
+  create() { isManager() ||  isCurrentUser(uid) }
+  read()   { isManager() ||  isCurrentUser(uid) }
+  update() { isManager() ||  isCurrentUser(uid) }
+  delete() { isManager() && !isCurrentUser(uid) }
+}
+
+path /users/{uid}/isManager {
+  write() { isManager() && !isCurrentUser(uid) }
+}
+
+path /repairs {
+  read()  { isManager() }
+  write() { isManager() }
+}
+
+path /repairs/{id} {
+  read() { isManager() || isCurrentUser(this.user) }
+}
+
+path /repairs/{id}/complete {
+  read()  { isManager() || isCurrentUser(this.parent().user) }
+  write() { isManager() || (isCurrentUser(this.parent().user) && this == true) }
+}
+
+path /repairs/{id}/approved {
+  validate() { this == false || this.parent().complete == true }
+}
+
+isCurrentUser(uid) { auth !== null && auth.uid === uid }
+
+isManager() { auth !== null && prior(root.users[auth.uid].isManager) }
