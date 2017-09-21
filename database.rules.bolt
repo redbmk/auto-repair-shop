@@ -39,6 +39,10 @@ path /users/{uid}/isManager {
   write() { isManager() && !isCurrentUser(uid) }
 }
 
+path /users/{uid}/repairs {
+  write() { false }
+}
+
 path /repairs {
   read()  { isManager() }
   write() { isManager() }
