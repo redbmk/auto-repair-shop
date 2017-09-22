@@ -1,45 +1,50 @@
 import React, { Component } from 'react';
 import firebase from './firebase';
 
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import RaisedButton from 'material-ui/RaisedButton';
-import CircularProgress from 'material-ui/CircularProgress';
+import FlatButton from 'material-ui/FlatButton';
 import AppBar from 'material-ui/AppBar';
+
+import UserMenu from './components/user-menu';
 
 class App extends Component {
   state = {
     loading: true,
+    alive: true,
     user: null,
   };
 
   componentWillMount() {
-    firebase.auth().onAuthStateChanged(user => {
-      this.setState({ loading: false, user });
+    this.setState({
+      authListenerUnsubscribe: firebase.auth().onAuthStateChanged(user => {
+        this.setState({ loading: false, user });
+      }),
     });
   }
 
-  toggleAuth = () => {
-    if (this.state.user) {
-      firebase.auth().signOut();
-    } else {
-      firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider());
-    }
+  componentWillUnmount() {
+    this.state.authListenerUnsubscribe();
   }
 
+  signIn = () => firebase.auth()
+    .signInWithPopup(new firebase.auth.GoogleAuthProvider())
+    .catch(err => null);
+
+  signOut = () => firebase.auth().signOut();
+
   render() {
-    const label = `Sign ${this.state.user ? 'Out' : 'In with Google'}`;
+    const userMenu = <UserMenu user={this.state.user} signOut={this.signOut} />;
+    const signInButton = !this.state.loading && !this.state.user &&
+      <FlatButton onClick={this.signIn} label="Sign In with Google" />;
+
     return (
-      <MuiThemeProvider>
-        <div>
-          <AppBar
-            title="Auto Repair Shop"
-            showMenuIconButton={false}
-          />
-          {this.state.loading
-            ? <CircularProgress />
-            : <RaisedButton onClick={this.toggleAuth} label={label} />}
-        </div>
-      </MuiThemeProvider>
+      <div>
+        <AppBar
+          title="Auto Repair Shop"
+          showMenuIconButton={false}
+          iconElementRight={userMenu}
+        />
+        {signInButton}
+      </div>
     );
   }
 }
