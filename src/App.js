@@ -5,6 +5,7 @@ import FlatButton from 'material-ui/FlatButton';
 import AppBar from 'material-ui/AppBar';
 
 import UserMenu from './components/user-menu';
+import GithubLink from './components/github-link';
 
 class App extends Component {
   state = {
@@ -31,8 +32,16 @@ class App extends Component {
 
   signOut = () => firebase.auth().signOut();
 
+  get appIcons() {
+    return (
+      <div>
+        <UserMenu user={this.state.user} signOut={this.signOut} />
+        <GithubLink />
+      </div>
+    );
+  }
+
   render() {
-    const userMenu = <UserMenu user={this.state.user} signOut={this.signOut} />;
     const signInButton = !this.state.loading && !this.state.user &&
       <FlatButton onClick={this.signIn} label="Sign In with Google" />;
 
@@ -41,7 +50,7 @@ class App extends Component {
         <AppBar
           title="Auto Repair Shop"
           showMenuIconButton={false}
-          iconElementRight={userMenu}
+          iconElementRight={this.appIcons}
         />
         {signInButton}
       </div>

@@ -9,7 +9,7 @@ export default function UserMenu({ user, signOut }) {
 
   const button = (
     <IconButton>
-      <Avatar src={user.photoURL} size={25} />
+      <Avatar src={user.photoURL} size={24} />
     </IconButton>
   );
 
