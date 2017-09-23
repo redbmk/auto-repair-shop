@@ -1,9 +1,10 @@
 type User {
   displayName: String,
+  email: String,
   photoURL: String,
   uid: String,
   repairs: String[],
-  isManager: Boolean,
+  isManager: Boolean | Null,
 }
 
 type Comment {
@@ -29,6 +30,8 @@ path /users {
 }
 
 path /users/{uid} is User {
+  validate() { this.uid == uid }
+
   create() { isManager() ||  isCurrentUser(uid) }
   read()   { isManager() ||  isCurrentUser(uid) }
   update() { isManager() ||  isCurrentUser(uid) }

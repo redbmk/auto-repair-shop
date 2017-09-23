@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import firebase from './firebase';
 
 import CircularProgress from 'material-ui/CircularProgress';
-import FlatButton from 'material-ui/FlatButton';
 import AppBar from 'material-ui/AppBar';
 
 import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
@@ -10,6 +9,8 @@ import RedirectableRoute from './components/redirectable-route';
 
 import UserMenu from './components/user-menu';
 import GithubLink from './components/github-link';
+
+import SignIn from './pages/sign-in';
 
 class App extends Component {
   state = {
@@ -30,10 +31,6 @@ class App extends Component {
     this.state.authListenerUnsubscribe();
   }
 
-  signIn = () => firebase.auth()
-    .signInWithPopup(new firebase.auth.GoogleAuthProvider())
-    .catch(err => null);
-
   signOut = () => firebase.auth().signOut();
 
   get appIcons() {
@@ -50,7 +47,6 @@ class App extends Component {
       return <CircularProgress />;
     }
 
-    const SignIn = () => <FlatButton onClick={this.signIn} label="Sign In with Google" />;
     const Repairs = () => <div>Repairs</div>;
 
     const requireAuth = !this.state.user && '/sign-in';
@@ -70,7 +66,6 @@ class App extends Component {
   }
 
   render() {
-
     const containerStyle = {
       display: 'flex',
       alignItems: 'center',
