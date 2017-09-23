@@ -17,12 +17,24 @@ class App extends Component {
     loading: true,
     alive: true,
     user: null,
+    userRef: null,
   };
 
   componentWillMount() {
     this.setState({
-      authListenerUnsubscribe: firebase.auth().onAuthStateChanged(user => {
-        this.setState({ loading: false, user });
+      authListenerUnsubscribe: firebase.auth().onAuthStateChanged(authUser => {
+        if (authUser) {
+          const userRef = firebase.database().ref(`/users/${authUser.uid}`)
+          userRef.on('value', this.setUserState);
+
+          this.setState({ userRef });
+        } else {
+          if (this.state.userRef) {
+            this.state.userRef.off('value', this.setUserState);
+          }
+
+          this.setState({ loading: false, user: null, userRef: null });
+        }
       }),
     });
   }
@@ -32,6 +44,9 @@ class App extends Component {
   }
 
   signOut = () => firebase.auth().signOut();
+  setUserState = userSnapshot => {
+    this.setState({ loading: false, user: userSnapshot.val() });
+  }
 
   get appIcons() {
     return (
@@ -48,8 +63,12 @@ class App extends Component {
     }
 
     const Repairs = () => <div>Repairs</div>;
+    const ManageUsers = () => <div>Manage Users</div>;
+
+    const { isManager } = this.state.user || {};
 
     const requireAuth = !this.state.user && '/sign-in';
+    const requireManager = !isManager && '/sign-in';
     const requireUnauth = this.state.user && '/';
 
     return (
@@ -57,7 +76,8 @@ class App extends Component {
         <main>
           <Switch>
             <RedirectableRoute redirect={requireAuth} exact path="/" component={Repairs} />
-            <RedirectableRoute redirect={requireUnauth} exact path="/sign-in" component={SignIn} />
+            <RedirectableRoute redirect={requireManager} path="/manage-users" component={ManageUsers} />
+            <RedirectableRoute redirect={requireUnauth} path="/sign-in" component={SignIn} />
             <Route render={() => <Redirect to="/" />} />
           </Switch>
         </main>
