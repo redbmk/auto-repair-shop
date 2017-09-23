@@ -5,7 +5,7 @@ import CircularProgress from 'material-ui/CircularProgress';
 import FlatButton from 'material-ui/FlatButton';
 import AppBar from 'material-ui/AppBar';
 
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
 import RedirectableRoute from './components/redirectable-route';
 
 import UserMenu from './components/user-menu';
@@ -59,8 +59,11 @@ class App extends Component {
     return (
       <Router>
         <main>
-          <RedirectableRoute redirect={requireAuth} exact path="/" component={Repairs} />
-          <RedirectableRoute redirect={requireUnauth} exact path="/sign-in" component={SignIn} />
+          <Switch>
+            <RedirectableRoute redirect={requireAuth} exact path="/" component={Repairs} />
+            <RedirectableRoute redirect={requireUnauth} exact path="/sign-in" component={SignIn} />
+            <Route render={() => <Redirect to="/" />} />
+          </Switch>
         </main>
       </Router>
     );
