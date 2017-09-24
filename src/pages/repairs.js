@@ -3,9 +3,19 @@ import PropTypes from 'prop-types';
 
 import { Div } from 'glamorous';
 
+import Avatar from 'material-ui/Avatar';
+
+import PersonAddIcon from 'material-ui/svg-icons/social/person-add';
+import DeleteIcon from 'material-ui/svg-icons/action/delete';
+
 import RepairList from '../components/repair-list';
 
 import firebase from '../firebase';
+
+function sortUsers(a, b) {
+  return a.displayName.localeCompare(b.displayName)
+    || a.email.localeCompare(b.email);
+}
 
 class Repairs extends Component {
   static propTypes = {
@@ -14,6 +24,7 @@ class Repairs extends Component {
 
   state = {
     users: {},
+    sortedUsers: [],
     repairs: [],
   }
 
@@ -35,8 +46,31 @@ class Repairs extends Component {
     this.repairsRef.off('value', this.updateRepairs);
   }
 
+  get deletedUser() {
+    const icon = <DeleteIcon />;
+    return {
+      displayName: <i>[ Deleted ]</i>,
+      photoURL: <Avatar icon={icon} />,
+    };
+  }
+
+  get unassignedUser() {
+    const icon = <PersonAddIcon />;
+    return {
+      displayName: <i>[ Unassigned ]</i>,
+      photoURL: <Avatar icon={icon} />,
+      uid: null,
+    };
+  }
+
   updateUsers = snapshot => {
-    this.setState({ users: snapshot.val() });
+    const users = snapshot.val();
+    const sortedUsers = Object.values(users).sort(sortUsers);
+
+    users.unassigned = this.unassignedUser;
+    users.deleted = this.deletedUser;
+
+    this.setState({ users, sortedUsers });
   }
 
   updateRepairs = snapshot => {

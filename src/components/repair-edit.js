@@ -3,11 +3,9 @@ import PropTypes from 'prop-types';
 import { Div } from 'glamorous';
 
 import { Card, CardHeader, CardText } from 'material-ui/Card';
-import Avatar from 'material-ui/Avatar';
 import Toggle from 'material-ui/Toggle';
 
-import PersonAdd from 'material-ui/svg-icons/social/person-add';
-import Delete from 'material-ui/svg-icons/action/delete';
+import UserSelect from './user-select';
 
 import firebase from '../firebase';
 
@@ -23,30 +21,13 @@ class RepairEdit extends Component {
     ref.set(!this.props.repair.completed);
   }
 
-  get deletedUser() {
-    const icon = <Delete />;
-    return {
-      displayName: <i>[ Deleted ]</i>,
-      photoURL: <Avatar icon={icon} />,
-    };
-  }
-
-  get unassignedUser() {
-    const icon = <PersonAdd />;
-    return {
-      displayName: <i>[ Unassigned ]</i>,
-      photoURL: <Avatar icon={icon} />,
-    };
-  }
-
   get userHeader() {
     const { repair, users, currentUser } = this.props;
-
     if (currentUser.uid === repair.user && !currentUser.isManager) return null;
 
     const user = repair.user
-      ? users[repair.user] || this.deletedUser
-      : this.unassignedUser;
+      ? users[repair.user] || users.deleted
+      : users.unassigned;
 
     return (
       <CardHeader
@@ -54,6 +35,25 @@ class RepairEdit extends Component {
         subtitle={user.email}
         avatar={user.photoURL}
       />
+    );
+  }
+
+  selectUser = user => {
+    const ref = firebase.database().ref(`/repairs/${this.props.repair.key}/user`);
+    ref.set(user && user.uid);
+  }
+
+  get assignUser() {
+    if (!this.props.currentUser.isManager) return null;
+
+    return (
+      <CardText>
+        <UserSelect
+          selected={this.props.users[this.props.repair.user]}
+          users={this.props.sortedUsers}
+          onChange={this.selectUser}
+        />
+      </CardText>
     );
   }
 
@@ -67,6 +67,7 @@ class RepairEdit extends Component {
             title={repair.title}
             subtitle={repair.description}
           />
+          {this.assignUser}
           <CardText>
             <Toggle
               toggled={repair.completed}

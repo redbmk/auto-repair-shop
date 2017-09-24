@@ -22,8 +22,9 @@ const RepairList = ({ repairs, ...rest }) => {
 }
 
 RepairList.propTypes = {
-  currentuser: PropTypes.object.isRequired,
+  currentUser: PropTypes.object.isRequired,
   users: PropTypes.object.isRequired,
+  sortedUsers: PropTypes.array.isRequired,
   repairs: PropTypes.array.isRequired,
 }
 
