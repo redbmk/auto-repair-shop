@@ -3,7 +3,7 @@ type User {
   email: String,
   photoURL: String,
   uid: String,
-  repairs: String[],
+  repairs: Boolean[],
   isManager: Boolean | Null,
 }
 
