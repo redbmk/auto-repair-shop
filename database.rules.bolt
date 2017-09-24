@@ -18,6 +18,8 @@ type Comment {
 type Repair {
   validate() { !this.user || root.users[this.user].exists() }
 
+  title: String,
+  description: String,
   datetime: Number,
   complete: Boolean,
   approved: Boolean,
@@ -33,7 +35,7 @@ path /users/{uid} is User {
   validate() { this.uid == uid }
 
   create() { isManager() ||  isCurrentUser(uid) }
-  read()   { isManager() ||  isCurrentUser(uid) }
+  read()   { auth != null }
   update() { isManager() ||  isCurrentUser(uid) }
   delete() { isManager() && !isCurrentUser(uid) }
 }

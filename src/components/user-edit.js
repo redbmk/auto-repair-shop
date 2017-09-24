@@ -7,7 +7,7 @@ import Toggle from 'material-ui/Toggle';
 
 import firebase from '../firebase';
 
-export default class UserEdit extends Component {
+class UserEdit extends Component {
   static propTypes = {
     user: PropTypes.object.isRequired,
     isCurrent: PropTypes.bool.isRequired,
@@ -43,3 +43,5 @@ export default class UserEdit extends Component {
     );
   }
 }
+
+export default UserEdit;

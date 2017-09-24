@@ -9,7 +9,7 @@ import firebase from '../firebase';
 
 class ManageUsers extends Component {
   static propTypes = {
-    currentUser: PropTypes.any.isRequired,
+    currentUser: PropTypes.object.isRequired,
   }
 
   state = {

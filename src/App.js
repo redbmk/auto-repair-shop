@@ -12,6 +12,7 @@ import AppBarWithLinks from './components/app-bar-with-links';
 
 import SignIn from './pages/sign-in';
 import ManageUsers from './pages/manage-users';
+import Repairs from './pages/repairs';
 
 const Main = glamorous.main({
   padding: '20px',
@@ -72,8 +73,6 @@ class App extends Component {
       return <Center height="100%" width="100%"><CircularProgress /></Center>;
     }
 
-    const Repairs = () => <div>Repairs</div>;
-
     const { isManager } = this.state.user || {};
 
     const requireAuth = !this.state.user && '/sign-in';
@@ -85,6 +84,7 @@ class App extends Component {
         <RedirectableRoute exact path="/"
           redirect={requireAuth}
           component={Repairs}
+          props={{currentUser: this.state.user}}
         />
         <RedirectableRoute path="/manage-users"
           redirect={requireManager}
