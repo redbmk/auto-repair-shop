@@ -1,16 +1,32 @@
 import React, { Component } from 'react';
 import firebase from './firebase';
+import glamorous from 'glamorous';
 
 import CircularProgress from 'material-ui/CircularProgress';
-import AppBar from 'material-ui/AppBar';
 
-import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
+import { Redirect, Route, Switch } from 'react-router-dom';
 import RedirectableRoute from './components/redirectable-route';
 
-import UserMenu from './components/user-menu';
-import GithubLink from './components/github-link';
+import Center from './components/center';
+import AppBarWithLinks from './components/app-bar-with-links';
 
 import SignIn from './pages/sign-in';
+
+const Main = glamorous.main({
+  padding: '20px',
+  boxSizing: 'border-box',
+  height: '100%',
+  width: '100%',
+  overflowY: 'auto',
+});
+
+const Container = glamorous.div({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  height: '100vh',
+});
 
 class App extends Component {
   state = {
@@ -43,23 +59,13 @@ class App extends Component {
     this.state.authListenerUnsubscribe();
   }
 
-  signOut = () => firebase.auth().signOut();
   setUserState = userSnapshot => {
     this.setState({ loading: false, user: userSnapshot.val() });
   }
 
-  get appIcons() {
-    return (
-      <div>
-        <UserMenu user={this.state.user} signOut={this.signOut} />
-        <GithubLink />
-      </div>
-    );
-  }
-
   get routes() {
     if (this.state.loading) {
-      return <CircularProgress />;
+      return <Center height="100%" width="100%"><CircularProgress /></Center>;
     }
 
     const Repairs = () => <div>Repairs</div>;
@@ -72,36 +78,21 @@ class App extends Component {
     const requireUnauth = this.state.user && '/';
 
     return (
-      <Router>
-        <main>
-          <Switch>
-            <RedirectableRoute redirect={requireAuth} exact path="/" component={Repairs} />
-            <RedirectableRoute redirect={requireManager} path="/manage-users" component={ManageUsers} />
-            <RedirectableRoute redirect={requireUnauth} path="/sign-in" component={SignIn} />
-            <Route render={() => <Redirect to="/" />} />
-          </Switch>
-        </main>
-      </Router>
+      <Switch>
+        <RedirectableRoute redirect={requireAuth} exact path="/" component={Repairs} />
+        <RedirectableRoute redirect={requireManager} path="/manage-users" component={ManageUsers} />
+        <RedirectableRoute redirect={requireUnauth} path="/sign-in" component={SignIn} />
+        <Route render={() => <Redirect to="/" />} />
+      </Switch>
     );
   }
 
   render() {
-    const containerStyle = {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '20px',
-    };
-
     return (
-      <div>
-        <AppBar
-          title="Auto Repair Shop"
-          showMenuIconButton={false}
-          iconElementRight={this.appIcons}
-        />
-        <div style={containerStyle}>{this.routes}</div>
-      </div>
+      <Container>
+        <AppBarWithLinks user={this.state.user} />
+        <Main>{this.routes}</Main>
+      </Container>
     );
   }
 }

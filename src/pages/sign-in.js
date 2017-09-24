@@ -3,6 +3,8 @@ import RaisedButton from 'material-ui/RaisedButton';
 
 import firebase from '../firebase';
 
+import Center from '../components/center';
+
 class SignIn extends Component {
   saveUser({ uid, displayName, email, photoURL }) {
     firebase.database().ref(`/users/${uid}`).update({ uid, displayName, email, photoURL });
@@ -14,7 +16,11 @@ class SignIn extends Component {
     .catch(err => null);
 
   render() {
-    return <RaisedButton onClick={this.signIn} label="Sign In with Google" />;
+    return (
+      <Center>
+        <RaisedButton onClick={this.signIn} label="Sign In with Google" />
+      </Center>
+    );
   }
 }
 

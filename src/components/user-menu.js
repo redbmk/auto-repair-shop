@@ -1,10 +1,15 @@
 import React from 'react';
+
 import Avatar from 'material-ui/Avatar';
 import IconButton from 'material-ui/IconButton';
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
 
-export default function UserMenu({ user, signOut }) {
+import firebase from '../firebase';
+
+const signOut = () => firebase.auth().signOut();
+
+export default function UserMenu({ user }) {
   if (!user) return null;
 
   const button = (

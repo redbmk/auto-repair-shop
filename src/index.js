@@ -4,11 +4,14 @@ import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import { BrowserRouter } from 'react-router-dom';
 
 function render(Component) {
   ReactDOM.render(
     <MuiThemeProvider>
-      <Component />
+      <BrowserRouter>
+        <Component />
+      </BrowserRouter>
     </MuiThemeProvider>
   , document.getElementById('root'));
 }
