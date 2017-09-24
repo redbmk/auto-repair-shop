@@ -99,7 +99,7 @@ class RepairEdit extends Component {
     const { repair, currentUser } = this.props;
 
     return (
-      <Div marginBottom="20">
+      <Div margin="20">
         <Card>
           <CardHeader
             avatar={this.editButton}

@@ -7,29 +7,48 @@ import TextField from 'material-ui/TextField';
 
 import firebase from '../firebase';
 
+const repairDefaults = {
+  title: '',
+  description: '',
+};
+
 class RepairEditDialog extends Component {
   static propTypes = {
-    repair: PropTypes.object.isRequired,
+    repair: PropTypes.object,
     onClose: PropTypes.func.isRequired,
   }
 
-  state = {
-    title: '',
-    description: '',
-  }
+  state = { ...repairDefaults }
 
   updateRepair = () => {
-    const ref = firebase.database().ref(`/repairs/${this.props.repair.key}`);
     const { title, description } = this.state;
+    const repair = { title, description };
 
-    ref.update({ title, description });
+    if (this.props.repair) {
+      const ref = firebase.database().ref(`/repairs/${this.props.repair.key}`);
+      ref.update(repair);
+    } else {
+      firebase.database().ref('/repairs').push(repair);
+    }
 
     this.props.onClose();
   }
 
-  componentWillReceiveProps({ repair: { title, description } }) {
+  sanitizeRepair(unclean = {}) {
+    const clean = { ...repairDefaults };
+
+    for (let prop of Object.keys(clean)) {
+      if (unclean[prop] !== undefined) {
+        clean[prop] = unclean[prop];
+      }
+    }
+
+    return clean;
+  }
+
+  componentWillReceiveProps({ repair }) {
     if (!this.props.open) {
-      this.setState({ title, description });
+      this.setState(this.sanitizeRepair(repair));
     }
   }
 
@@ -39,9 +58,10 @@ class RepairEditDialog extends Component {
 
   onKeyPress = event => {
     if (event.charCode !== 13) return;
-    if (event.target.type === 'text' || !event.shiftKey) this.updateRepair();
-
-    event.preventDefault();
+    if (event.target.type === 'text' || !event.shiftKey) {
+      this.updateRepair();
+      event.preventDefault();
+    }
   }
 
   render() {
@@ -58,9 +78,12 @@ class RepairEditDialog extends Component {
       />
     ];
 
+
+    const repair = this.sanitizeRepair(this.props.repair);
+
     return (
       <Dialog
-        title="Edit Repair"
+        title={this.props.repair ? "Edit Repair" : "Add New Repair"}
         actions={actions}
         open={this.props.open}
         modal={false}
@@ -69,7 +92,7 @@ class RepairEditDialog extends Component {
         <TextField
           floatingLabelText="Title"
           multiLine={false}
-          defaultValue={this.props.repair.title}
+          defaultValue={repair.title}
           name="title"
           fullWidth={true}
           onKeyPress={this.onKeyPress}
@@ -79,7 +102,7 @@ class RepairEditDialog extends Component {
           floatingLabelText="Description"
           multiLine={true}
           rows={1}
-          defaultValue={this.props.repair.description}
+          defaultValue={repair.description}
           name="description"
           fullWidth={true}
           onKeyPress={this.onKeyPress}
