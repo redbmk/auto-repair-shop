@@ -4,8 +4,12 @@ import { Div } from 'glamorous';
 
 import { Card, CardHeader, CardText } from 'material-ui/Card';
 import Toggle from 'material-ui/Toggle';
+import { List } from 'material-ui/List';
+import Subheader from 'material-ui/Subheader';
 
 import UserSelect from './user-select';
+import NewComment from './new-comment';
+import Comment from './comment';
 
 import firebase from '../firebase';
 
@@ -19,23 +23,6 @@ class RepairEdit extends Component {
   toggleCompleted = () => {
     const ref = firebase.database().ref(`/repairs/${this.props.repair.key}/completed`);
     ref.set(!this.props.repair.completed);
-  }
-
-  get userHeader() {
-    const { repair, users, currentUser } = this.props;
-    if (currentUser.uid === repair.user && !currentUser.isManager) return null;
-
-    const user = repair.user
-      ? users[repair.user] || users.deleted
-      : users.unassigned;
-
-    return (
-      <CardHeader
-        title={user.displayName}
-        subtitle={user.email}
-        avatar={user.photoURL}
-      />
-    );
   }
 
   selectUser = user => {
@@ -55,6 +42,17 @@ class RepairEdit extends Component {
         />
       </CardText>
     );
+  }
+
+  get comments() {
+    const { repair } = this.props;
+    const comments = [];
+    for (let key of Object.keys(repair.comments || {})) {
+      comments.push({ key, ...repair.comments[key] });
+    }
+
+    return comments.sort((a, b) => b.datetime - a.datetime)
+      .map(comment => <Comment key={comment.key} {...this.props} comment={comment} />);
   }
 
   render() {
@@ -77,9 +75,12 @@ class RepairEdit extends Component {
               label="Completed"
             />
           </CardText>
-          {this.userHeader}
           <CardText>
-            Hello world
+            <List>
+              <Subheader>Comments</Subheader>
+              <NewComment {...this.props} />
+              {this.comments}
+            </List>
           </CardText>
         </Card>
       </Div>
