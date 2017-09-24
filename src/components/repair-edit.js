@@ -32,6 +32,11 @@ class RepairEdit extends Component {
     ref.set(!this.props.repair.completed);
   }
 
+  toggleApproved = () => {
+    const ref = firebase.database().ref(`/repairs/${this.props.repair.key}/approved`);
+    ref.set(!this.props.repair.approved);
+  }
+
   selectUser = user => {
     const ref = firebase.database().ref(`/repairs/${this.props.repair.key}/user`);
     ref.set(user && user.uid);
@@ -110,6 +115,13 @@ class RepairEdit extends Component {
               disabled={repair.completed && !currentUser.isManager}
               labelPosition="right"
               label="Completed"
+            />
+            <Toggle
+              toggled={repair.approved}
+              onToggle={this.toggleApproved}
+              disabled={!repair.completed || !currentUser.isManager}
+              labelPosition="right"
+              label="Approved"
             />
           </CardText>
           <CardText>

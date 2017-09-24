@@ -21,7 +21,7 @@ type Repair {
   title: String,
   description: String,
   datetime: Number,
-  complete: Boolean,
+  completed: Boolean,
   approved: Boolean,
   user: String,
   comments: Comments[],
@@ -58,13 +58,13 @@ path /repairs/{id} {
   read() { isManager() || isCurrentUser(this.user) }
 }
 
-path /repairs/{id}/complete {
+path /repairs/{id}/completed {
   read()  { isManager() || isCurrentUser(this.parent().user) }
   write() { isManager() || (isCurrentUser(this.parent().user) && this == true) }
 }
 
 path /repairs/{id}/approved {
-  validate() { this == false || this.parent().complete == true }
+  validate() { this == false || this.parent().completed == true }
 }
 
 isCurrentUser(uid) { auth !== null && auth.uid === uid }
