@@ -6,10 +6,13 @@ import { Card, CardHeader, CardText } from 'material-ui/Card';
 import Toggle from 'material-ui/Toggle';
 import { List } from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
+import IconButton from 'material-ui/IconButton';
+import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 
 import UserSelect from './user-select';
 import NewComment from './new-comment';
 import Comment from './comment';
+import RepairEditDialog from './repair-edit-dialog';
 
 import firebase from '../firebase';
 
@@ -18,6 +21,10 @@ class RepairEdit extends Component {
     currentUser: PropTypes.object.isRequired,
     users: PropTypes.object.isRequired,
     repair: PropTypes.object.isRequired,
+  }
+
+  state = {
+    editingDescription: false,
   }
 
   toggleCompleted = () => {
@@ -55,6 +62,34 @@ class RepairEdit extends Component {
       .map(comment => <Comment key={comment.key} {...this.props} comment={comment} />);
   }
 
+  openDialog = () => this.setState({ editingDescription: true });
+  closeDialog = () => this.setState({ editingDescription: false });
+
+  get editDialog() {
+    if (!this.props.currentUser.isManager) return null;
+
+    return (
+      <RepairEditDialog {...this.props}
+        open={this.state.editingDescription}
+        onClose={this.closeDialog}
+      />
+    );
+  }
+
+  get editButton() {
+    if (!this.props.currentUser.isManager) return null;
+
+    return (
+      <IconButton tooltip="Edit Repair" onClick={this.openDialog} style={{marginTop: -5}}>
+        <EditIcon />
+      </IconButton>
+    );
+  }
+
+  componentWillReceiveProps({ currentUser: { isManager } }) {
+    if (!isManager) this.setState({ editingDescription: false });
+  }
+
   render() {
     const { repair, currentUser } = this.props;
 
@@ -62,8 +97,10 @@ class RepairEdit extends Component {
       <Div marginBottom="20">
         <Card>
           <CardHeader
+            avatar={this.editButton}
             title={repair.title}
             subtitle={repair.description}
+            subtitleStyle={{whiteSpace: 'pre-wrap'}}
           />
           {this.assignUser}
           <CardText>
@@ -83,6 +120,7 @@ class RepairEdit extends Component {
             </List>
           </CardText>
         </Card>
+        {this.editDialog}
       </Div>
     );
   }
