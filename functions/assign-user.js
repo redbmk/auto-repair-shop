@@ -9,7 +9,11 @@ exports.assignUser = functions.database.ref('/repairs/{id}').onWrite(({ data }) 
 
     return Promise.all([
       prevUID !== null && root.child(`/users/${prevUID}/repairs/${data.key}`).remove(),
-      nextUID !== null && root.child(`/users/${nextUID}/repairs/${data.key}`).set(true),
+      nextUID !== null && root.child(`/users/${nextUID}`).once('value', user => {
+        if (user.exists()) {
+          user.child(`repairs/${data.key}`).set(true);
+        }
+      }),
     ].filter(cmd => cmd));
   }
 });
