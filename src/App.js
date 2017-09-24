@@ -11,6 +11,7 @@ import Center from './components/center';
 import AppBarWithLinks from './components/app-bar-with-links';
 
 import SignIn from './pages/sign-in';
+import ManageUsers from './pages/manage-users';
 
 const Main = glamorous.main({
   padding: '20px',
@@ -31,7 +32,6 @@ const Container = glamorous.div({
 class App extends Component {
   state = {
     loading: true,
-    alive: true,
     user: null,
     userRef: null,
   };
@@ -45,18 +45,22 @@ class App extends Component {
 
           this.setState({ userRef });
         } else {
-          if (this.state.userRef) {
-            this.state.userRef.off('value', this.setUserState);
-          }
-
+          this.removeUserRefListener();
           this.setState({ loading: false, user: null, userRef: null });
         }
       }),
     });
   }
 
+  removeUserRefListener() {
+    if (this.state.userRef) {
+      this.state.userRef.off('value', this.setUserState);
+    }
+  }
+
   componentWillUnmount() {
     this.state.authListenerUnsubscribe();
+    this.removeUserRefListener();
   }
 
   setUserState = userSnapshot => {
@@ -69,7 +73,6 @@ class App extends Component {
     }
 
     const Repairs = () => <div>Repairs</div>;
-    const ManageUsers = () => <div>Manage Users</div>;
 
     const { isManager } = this.state.user || {};
 
@@ -79,8 +82,15 @@ class App extends Component {
 
     return (
       <Switch>
-        <RedirectableRoute redirect={requireAuth} exact path="/" component={Repairs} />
-        <RedirectableRoute redirect={requireManager} path="/manage-users" component={ManageUsers} />
+        <RedirectableRoute exact path="/"
+          redirect={requireAuth}
+          component={Repairs}
+        />
+        <RedirectableRoute path="/manage-users"
+          redirect={requireManager}
+          component={ManageUsers}
+          props={{currentUser: this.state.user}}
+        />
         <RedirectableRoute redirect={requireUnauth} path="/sign-in" component={SignIn} />
         <Route render={() => <Redirect to="/" />} />
       </Switch>

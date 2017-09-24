@@ -39,6 +39,7 @@ path /users/{uid} is User {
 }
 
 path /users/{uid}/isManager {
+  validate() { this == prior(this) || (isManager() && !isCurrentUser(uid)) }
   write() { isManager() && !isCurrentUser(uid) }
 }
 
