@@ -28,7 +28,7 @@ type Repair {
 }
 
 path /users {
-  read() { isManager() }
+  read() { auth != null }
 }
 
 path /users/{uid} is User {
@@ -56,6 +56,11 @@ path /repairs {
 
 path /repairs/{id} {
   read() { isManager() || isCurrentUser(this.user) }
+}
+
+path /repairs/{id}/comments {
+  create() { isManager() || isCurrentUser(this.parent().user) }
+  update() { isManager() || isCurrentUser(this.parent().user) }
 }
 
 path /repairs/{id}/completed {

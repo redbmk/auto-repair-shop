@@ -25,20 +25,15 @@ class Repairs extends Component {
     sortedUsers: [],
   }
 
-  get usersRef() {
-    return firebase.database().ref('/users');
-  }
-
-  get repairsRef() {
-    return firebase.database().ref('/repairs');
-  }
-
   componentWillMount() {
-    this.usersRef.on('value', this.updateUsers);
+    const usersRef = firebase.database().ref('/users');
+    usersRef.on('value', this.updateUsers);
+
+    this.setState({ usersRef });
   }
 
   componentWillUnmount() {
-    this.usersRef.off('value', this.updateUsers);
+    this.state.usersRef.off('value', this.updateUsers);
   }
 
   get deletedUser() {

@@ -25,7 +25,7 @@ export default class AppBarWithLinks extends Component {
       <FlatButton
         style={flatButtonStyles}
         containerElement={link}
-        label="Manager Users"
+        label="Manage Users"
       />
     );
   }

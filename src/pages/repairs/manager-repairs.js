@@ -10,7 +10,7 @@ class ManagerRepairs extends Component {
   }
 
   state = {
-    repairs: null,
+    repairs: [],
   }
 
   componentWillMount() {
