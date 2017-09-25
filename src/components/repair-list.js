@@ -7,6 +7,7 @@ import FloatingActionButton from 'material-ui/FloatingActionButton';
 import AddIcon from 'material-ui/svg-icons/content/add';
 
 import RepairEdit from './repair-edit';
+import RepairFilter from './repair-filter';
 import RepairEditDialog from './repair-edit-dialog';
 
 const styles = {
@@ -16,6 +17,11 @@ const styles = {
     right: 40,
   }
 };
+
+const sortRepairs = (a, b) => {
+  return a.date.localeCompare(b.date)
+    || a.time.localeCompare(b.time);
+}
 
 class RepairList extends Component {
   static propTypes = {
@@ -27,10 +33,12 @@ class RepairList extends Component {
 
   state = {
     isEditorOpen: false,
+    filters: [],
   }
 
   openEditor = () => this.setState({ isEditorOpen: true });
   closeEditor = () => this.setState({ isEditorOpen: false });
+  updateFilters = filters => this.setState({ filters });
 
   get addRepairWidget() {
     if (!this.props.currentUser.isManager) return null;
@@ -48,19 +56,21 @@ class RepairList extends Component {
     );
   }
 
-  get sortedRepairs() {
-    const { repairs } = this.props;
+  get filteredRepairs() {
+    let repairs = [ ...this.props.repairs ];
 
-    return [ ...repairs ].sort((a, b) => {
-      return a.date.localeCompare(b.date)
-        || a.time.localeCompare(b.time);
-    });
+    for (let filter of this.state.filters) {
+      repairs = repairs.filter(filter);
+    }
+
+    return repairs.sort(sortRepairs);
   }
 
   render() {
     const { repairs, ...rest } = this.props;
+    const filteredRepairs = this.filteredRepairs;
 
-    const editors = this.sortedRepairs.map(repair => (
+    const editors = filteredRepairs.map(repair => (
       <RepairEdit
         key={repair.key}
         repair={repair}
@@ -70,6 +80,10 @@ class RepairList extends Component {
 
     return (
       <div>
+        <RepairFilter
+          subtitle={`Showing ${filteredRepairs.length} of ${repairs.length}`}
+          onChange={this.updateFilters}
+        />
         <Div display="flex" justifyContent="space-between" flexWrap="wrap">
           {editors}
         </Div>
