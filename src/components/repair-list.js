@@ -82,6 +82,7 @@ class RepairList extends Component {
       <div>
         <RepairFilter
           subtitle={`Showing ${filteredRepairs.length} of ${repairs.length}`}
+          users={this.props.currentUser.isManager && this.props.sortedUsers}
           onChange={this.updateFilters}
         />
         <Div display="flex" justifyContent="space-between" flexWrap="wrap">

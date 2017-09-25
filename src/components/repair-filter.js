@@ -13,6 +13,8 @@ import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
 import FilterIcon from 'material-ui/svg-icons/content/filter-list';
 import ClearIcon from 'material-ui/svg-icons/content/clear';
 
+import UserSelect from './user-select';
+
 import { serializeDate, serializeTime } from '../moment';
 
 const fromDateFilter = date => repair => repair.date >= date;
@@ -21,6 +23,7 @@ const fromTimeFilter = time => repair => repair.time >= time;
 const toTimeFilter = time => repair => repair.time <= time;
 
 const completedFilter = completed => repair => !!repair.completed === completed;
+const userFilter = uid => repair => (repair.user || null) === uid;
 
 const Range = glamorous.div({
   display: 'flex',
@@ -40,10 +43,17 @@ const styles = {
   }
 };
 
+const unassignedUser = {
+  displayName: <i>Unassigned</i>,
+  photoURL: 'https://goo.gl/FX8c4a',
+  uid: null,
+};
+
 class RepairFilter extends Component {
   static propTypes = {
     subtitle: PropTypes.string,
     onChange: PropTypes.func.isRequired,
+    users: PropTypes.array,
   }
 
   state = {
@@ -53,6 +63,7 @@ class RepairFilter extends Component {
     toTime: null,
 
     completed: '',
+    user: null,
   }
 
   getFilters(props) {
@@ -64,6 +75,7 @@ class RepairFilter extends Component {
     if (props.toTime) filters.push(toTimeFilter(serializeTime(props.toTime)));
 
     if (props.completed !== '') filters.push(completedFilter(props.completed));
+    if (props.user) filters.push(userFilter(props.user.uid));
 
     return filters;
   }
@@ -71,7 +83,6 @@ class RepairFilter extends Component {
   updateField(field, value = null) {
     const state = { ...this.state, [field]: value };
     const filters = this.getFilters(state);
-    console.log(state, filters);
 
     this.props.onChange(filters);
     this.setState(state);
@@ -84,6 +95,30 @@ class RepairFilter extends Component {
 
   updateFieldFromEvent = (event, value) => {
     this.updateField(event.target.name, value)
+  }
+
+  updateUser = user => this.updateField('user', user)
+
+  get userSelect() {
+    if (!this.props.users) return null;
+
+    const users = [
+      unassignedUser,
+      ...this.props.users,
+    ];
+
+    const emptyText = <i>Show All</i>;
+
+    const selected = this.state.user && users.find(({ uid }) => this.state.user.uid === uid);
+
+    return (
+      <UserSelect
+        emptyText={emptyText}
+        users={users}
+        onChange={this.updateUser}
+        selected={selected}
+      />
+    );
   }
 
   render() {
@@ -148,6 +183,8 @@ class RepairFilter extends Component {
             <RadioButton style={styles.radioButton} value={true} label="Completed" />
             <RadioButton style={styles.radioButton} value={false} label="Incomplete" />
           </RadioButtonGroup>
+
+          {this.userSelect}
         </CardText>
       </Card>
     );

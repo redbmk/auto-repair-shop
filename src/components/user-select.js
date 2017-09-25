@@ -10,6 +10,7 @@ class UserSelect extends Component {
     users: PropTypes.array.isRequired,
     selected: PropTypes.object,
     onChange: PropTypes.func.isRequired,
+    emptyText: PropTypes.string,
   }
 
   get menuItems() {
@@ -41,6 +42,8 @@ class UserSelect extends Component {
   onChange = (event, key, user) => this.props.onChange(user);
 
   render() {
+    const emptyText = this.props.emptyText || <i>Unassigned</i>;
+
     return (
       <SelectField
         floatingLabelText="Assigned User"
@@ -48,7 +51,7 @@ class UserSelect extends Component {
         selectionRenderer={this.selectionRenderer}
         onChange={this.onChange}
       >
-        <MenuItem value={null} primaryText={<i>Unassigned</i>} />
+        <MenuItem value={null} primaryText={emptyText} />
         {this.menuItems}
       </SelectField>
     );
