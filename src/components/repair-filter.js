@@ -103,7 +103,7 @@ class RepairFilter extends Component {
               onChange={this.updateFromTime}
               value={this.state.fromTime}
             />
-            <IconButton onClick={this.updateToTime} disabled={!this.state.toDate}>
+            <IconButton onClick={this.updateToTime} disabled={!this.state.toTime}>
               <ClearIcon />
             </IconButton>
             <TimePicker
