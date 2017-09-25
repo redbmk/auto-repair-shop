@@ -1,10 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import Avatar from 'material-ui/Avatar';
-
-import DeleteIcon from 'material-ui/svg-icons/action/delete';
-
 import ManagerRepairs from './repairs/manager-repairs';
 import UserRepairs from './repairs/user-repairs';
 
@@ -36,19 +32,9 @@ class Repairs extends Component {
     this.state.usersRef.off('value', this.updateUsers);
   }
 
-  get deletedUser() {
-    const icon = <DeleteIcon />;
-    return {
-      displayName: <i>[ Deleted ]</i>,
-      photoURL: <Avatar icon={icon} />,
-    };
-  }
-
   updateUsers = snapshot => {
     const users = snapshot.val();
     const sortedUsers = Object.values(users).sort(sortUsers);
-
-    users.deleted = this.deletedUser;
 
     this.setState({ users, sortedUsers });
   }

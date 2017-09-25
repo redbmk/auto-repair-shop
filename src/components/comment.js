@@ -5,6 +5,8 @@ import Avatar from 'material-ui/Avatar';
 import { ListItem } from 'material-ui/List';
 import { lightBlack } from 'material-ui/styles/colors';
 
+import DeleteIcon from 'material-ui/svg-icons/action/delete';
+
 import { formatDateTime } from '../moment';
 
 const styles = {
@@ -19,9 +21,14 @@ const styles = {
   }
 };
 
+const deletedUser = {
+  displayName: <i>[ Deleted ]</i>,
+  photoURL: <Avatar icon={<DeleteIcon />} />,
+}
+
 const Comment = ({ comment, users }) => {
 
-  const user = users[comment.user] || users.deleted;
+  const user = users[comment.user] || deletedUser;
   const avatar = typeof user.photoURL === 'string'
     ? <Avatar src={user.photoURL} />
     : user.photoURL;
