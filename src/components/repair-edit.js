@@ -18,6 +18,7 @@ import Comment from './comment';
 import RepairEditDialog from './repair-edit-dialog';
 
 import firebase from '../firebase';
+import { formatDate, formatTime } from '../moment';
 
 class RepairEdit extends Component {
   static propTypes = {
@@ -128,6 +129,9 @@ class RepairEdit extends Component {
             subtitle={repair.description}
             subtitleStyle={{whiteSpace: 'pre-wrap'}}
           />
+          <CardText>
+            {formatDate(repair.date)} {formatTime(repair.time)}
+          </CardText>
           {this.assignUser}
           <CardText>
             <Toggle

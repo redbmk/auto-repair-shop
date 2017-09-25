@@ -5,6 +5,8 @@ import Avatar from 'material-ui/Avatar';
 import { ListItem } from 'material-ui/List';
 import { lightBlack } from 'material-ui/styles/colors';
 
+import { formatDateTime } from '../moment';
+
 const styles = {
   datetime: {
     fontSize: '.7em',
@@ -27,7 +29,7 @@ const Comment = ({ comment, users }) => {
   const primaryText = (
     <span>
       {user.displayName}
-      <span style={styles.datetime}>{comment.datetime}</span>
+      <span style={styles.datetime}>{formatDateTime(comment.datetime)}</span>
     </span>
   );
 

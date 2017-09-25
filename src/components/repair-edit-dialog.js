@@ -7,14 +7,8 @@ import TextField from 'material-ui/TextField';
 import DatePicker from 'material-ui/DatePicker';
 import TimePicker from 'material-ui/TimePicker';
 
-import moment from 'moment';
-
 import firebase from '../firebase';
-
-const FORMATS = {
-  DATE: 'YYYYMMDD',
-  TIME: 'HH:mm',
-};
+import { asDate, asTime, serializeDate, serializeTime } from '../moment';
 
 const repairDefaults = {
   title: null,
@@ -42,8 +36,8 @@ class RepairEditDialog extends Component {
 
     return {
       ...repair,
-      date: repair.date.format(FORMATS.DATE),
-      time: repair.time.format(FORMATS.TIME),
+      date: serializeDate(repair.date),
+      time: serializeTime(repair.time),
     };
   }
 
@@ -72,11 +66,11 @@ class RepairEditDialog extends Component {
       }
 
       if (value && prop === 'date') {
-        value = moment(value, FORMATS.DATE);
+        value = asDate(value);
       }
 
       if (value && prop === 'time') {
-        value = moment(value, FORMATS.TIME)
+        value = asTime(value);
       }
 
       clean[prop] = value;
@@ -99,8 +93,8 @@ class RepairEditDialog extends Component {
     this.setState({ [event.target.name]: value });
   }
 
-  updateDate = (event, date) => this.setState({ date: moment(date) })
-  updateTime = (event, time) => this.setState({ time: moment(time) })
+  updateDate = (event, date) => this.setState({ date: asDate(date) })
+  updateTime = (event, time) => this.setState({ time: asTime(time) })
 
   onKeyPress = event => {
     if (event.charCode !== 13) return;

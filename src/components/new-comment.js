@@ -6,6 +6,7 @@ import TextField from 'material-ui/TextField';
 import { ListItem } from 'material-ui/List';
 
 import firebase from '../firebase';
+import { serializeDateTime } from '../moment';
 
 class NewComment extends Component {
   state = {
@@ -22,7 +23,7 @@ class NewComment extends Component {
       if (this.state.value.trim()) {
         firebase.database().ref(`/repairs/${this.props.repair.key}/comments`).push({
           message: this.state.value,
-          datetime: +(new Date()),
+          datetime: serializeDateTime(),
           user: this.props.currentUser.uid,
         });
 
