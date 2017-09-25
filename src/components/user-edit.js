@@ -2,8 +2,11 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Div } from 'glamorous';
 
-import { Card, CardHeader, CardText } from 'material-ui/Card';
+import { Card, CardActions, CardHeader, CardText } from 'material-ui/Card';
 import Toggle from 'material-ui/Toggle';
+import FlatButton from 'material-ui/FlatButton';
+
+import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
 import firebase from '../firebase';
 
@@ -13,9 +16,33 @@ class UserEdit extends Component {
     isCurrent: PropTypes.bool.isRequired,
   }
 
+  get userRef() {
+    return firebase.database().ref(`/users/${this.props.user.uid}`);
+  }
+
   toggleManager = () => {
-    const ref = firebase.database().ref(`/users/${this.props.user.uid}/isManager`);
-    ref.set(!this.props.user.isManager);
+    this.userRef.child('isManager').set(!this.props.user.isManager);
+  }
+
+  deleteUser = () => {
+    this.userRef.remove();
+  }
+
+  get actions() {
+    if (this.props.isCurrent) return;
+
+    const icon = <DeleteIcon />;
+
+    return (
+      <CardActions>
+        <FlatButton
+          icon={icon}
+          onClick={this.deleteUser}
+          secondary={true}
+          label="Delete"
+        />
+      </CardActions>
+    );
   }
 
   render() {
@@ -38,6 +65,7 @@ class UserEdit extends Component {
               label="Manager"
             />
           </CardText>
+          {this.actions}
         </Card>
       </Div>
     );
