@@ -2,12 +2,15 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Div } from 'glamorous';
 
-import { Card, CardHeader, CardText } from 'material-ui/Card';
+import { Card, CardActions, CardHeader, CardText } from 'material-ui/Card';
 import Toggle from 'material-ui/Toggle';
 import { List } from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 import IconButton from 'material-ui/IconButton';
+import FlatButton from 'material-ui/FlatButton';
+
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
+import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
 import UserSelect from './user-select';
 import NewComment from './new-comment';
@@ -69,6 +72,9 @@ class RepairEdit extends Component {
 
   openDialog = () => this.setState({ editingDescription: true });
   closeDialog = () => this.setState({ editingDescription: false });
+  deleteRepair = () => {
+    firebase.database().ref(`/repairs/${this.props.repair.key}`).remove();
+  }
 
   get editDialog() {
     if (!this.props.currentUser.isManager) return null;
@@ -88,6 +94,21 @@ class RepairEdit extends Component {
       <IconButton tooltip="Edit Repair" onClick={this.openDialog} style={{marginTop: -5}}>
         <EditIcon />
       </IconButton>
+    );
+  }
+
+  get deleteAction() {
+    if (!this.props.currentUser.isManager) return null;
+
+    return (
+      <CardActions>
+        <FlatButton
+          icon={<DeleteIcon />}
+          onClick={this.deleteRepair}
+          secondary={true}
+          label="Delete"
+        />
+      </CardActions>
     );
   }
 
@@ -124,6 +145,7 @@ class RepairEdit extends Component {
               label="Approved"
             />
           </CardText>
+          {this.deleteAction}
           <CardText>
             <List>
               <Subheader>Comments</Subheader>
