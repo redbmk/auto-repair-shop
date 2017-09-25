@@ -48,10 +48,19 @@ class RepairList extends Component {
     );
   }
 
+  get sortedRepairs() {
+    const { repairs } = this.props;
+
+    return [ ...repairs ].sort((a, b) => {
+      return a.date.localeCompare(b.date)
+        || a.time.localeCompare(b.time);
+    });
+  }
+
   render() {
     const { repairs, ...rest } = this.props;
 
-    const editors = repairs.map(repair => (
+    const editors = this.sortedRepairs.map(repair => (
       <RepairEdit
         key={repair.key}
         repair={repair}
