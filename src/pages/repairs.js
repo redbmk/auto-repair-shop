@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import { Div } from 'glamorous';
-
 import Avatar from 'material-ui/Avatar';
 
-import PersonAddIcon from 'material-ui/svg-icons/social/person-add';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
-import RepairList from '../components/repair-list';
+import ManagerRepairs from './repairs/manager-repairs';
+import UserRepairs from './repairs/user-repairs';
 
 import firebase from '../firebase';
 
@@ -25,7 +23,6 @@ class Repairs extends Component {
   state = {
     users: {},
     sortedUsers: [],
-    repairs: [],
   }
 
   get usersRef() {
@@ -38,12 +35,10 @@ class Repairs extends Component {
 
   componentWillMount() {
     this.usersRef.on('value', this.updateUsers);
-    this.repairsRef.on('value', this.updateRepairs);
   }
 
   componentWillUnmount() {
     this.usersRef.off('value', this.updateUsers);
-    this.repairsRef.off('value', this.updateRepairs);
   }
 
   get deletedUser() {
@@ -54,42 +49,19 @@ class Repairs extends Component {
     };
   }
 
-  get unassignedUser() {
-    const icon = <PersonAddIcon />;
-    return {
-      displayName: <i>[ Unassigned ]</i>,
-      photoURL: <Avatar icon={icon} />,
-      uid: null,
-    };
-  }
-
   updateUsers = snapshot => {
     const users = snapshot.val();
     const sortedUsers = Object.values(users).sort(sortUsers);
 
-    users.unassigned = this.unassignedUser;
     users.deleted = this.deletedUser;
 
     this.setState({ users, sortedUsers });
   }
 
-  updateRepairs = snapshot => {
-    const repairHash = snapshot.val() || {};
-    const repairs = [];
-
-    for (let key of Object.keys(repairHash)) {
-      repairs.push({ ...repairHash[key], key });
-    }
-
-    this.setState({ repairs });
-  }
-
   render() {
-    return (
-      <Div display="flex" justifyContent="space-between" flexWrap="wrap">
-        <RepairList {...this.state} {...this.props} />
-      </Div>
-    );
+    const RepairListComponent = this.props.currentUser.isManager ? ManagerRepairs : UserRepairs;
+
+    return <RepairListComponent {...this.props} {...this.state} />;
   }
 }
 
