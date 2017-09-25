@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
+import { Div } from 'glamorous';
+
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
@@ -8,19 +10,21 @@ import DatePicker from 'material-ui/DatePicker';
 import TimePicker from 'material-ui/TimePicker';
 
 import firebase from '../firebase';
-import { asDate, asTime, serializeDate, serializeTime } from '../moment';
+import { asDate, asTime, serializeDate, serializeTime, hourRange, formatDateTime } from '../moment';
 
 const repairDefaults = {
   title: null,
   description: null,
   date: null,
   time: null,
+  key: null,
 };
 
 class RepairEditDialog extends Component {
   static propTypes = {
     repair: PropTypes.object,
     onClose: PropTypes.func.isRequired,
+    blockedTimes: PropTypes.array.isRequired,
   }
 
   state = { ...repairDefaults }
@@ -41,9 +45,37 @@ class RepairEditDialog extends Component {
     };
   }
 
-  updateRepair = () => {
+  get validationErrors() {
     const repair = this.validatedRepair;
-    if (!repair) return;
+
+    let error;
+    if (repair) {
+      const repairRange = hourRange(repair);
+      const errors = this.props.blockedTimes
+        .filter(({ key }) => key !== repair.key)
+        .filter(({ range }) => range.overlaps(repairRange))
+        .map(({ range }) => range.toDate().map(formatDateTime).join(' - '))
+        .map((text, index) => <p key={index}>{text}</p>);
+
+      if (errors.length) {
+        error = (
+          <div>
+            <p>The following date ranges conflict with the time you've chosen:</p>
+            {errors}
+          </div>
+        );
+      }
+    } else {
+      error = 'All fields are required.';
+    }
+
+    return error ? <Div color="red">{error}</Div> : null;
+  }
+
+  updateRepair = () => {
+    if (this.validationErrors) return;
+
+    const repair = { ...this.validatedRepair, key: null };
 
     if (this.props.repair) {
       const ref = firebase.database().ref(`/repairs/${this.props.repair.key}`);
@@ -107,6 +139,8 @@ class RepairEditDialog extends Component {
   render() {
     const repair = this.sanitizeRepair(this.state);
 
+    const validationErrors = this.validationErrors;
+
     const actions = [
       <FlatButton
         label="Cancel"
@@ -117,7 +151,7 @@ class RepairEditDialog extends Component {
         label="Save"
         primary={true}
         onClick={this.updateRepair}
-        disabled={!this.validatedRepair}
+        disabled={!!validationErrors}
       />
     ];
 
@@ -148,18 +182,22 @@ class RepairEditDialog extends Component {
           onKeyPress={this.onKeyPress}
           onChange={this.updateText}
         />
-        <DatePicker
-          hintText="Date"
-          name="date"
-          onChange={this.updateDate}
-          value={repair.date && new Date(repair.date)}
-        />
-        <TimePicker
-          hintText="Time"
-          name="date"
-          value={repair.time && new Date(repair.time)}
-          onChange={this.updateTime}
-        />
+        <Div display="flex" justifyContent="flex-start">
+          <DatePicker
+            hintText="Date"
+            name="date"
+            style={{marginRight: 20}}
+            onChange={this.updateDate}
+            value={repair.date && new Date(repair.date)}
+          />
+          <TimePicker
+            hintText="Time"
+            name="date"
+            value={repair.time && new Date(repair.time)}
+            onChange={this.updateTime}
+          />
+        </Div>
+        {validationErrors}
       </Dialog>
     );
   }

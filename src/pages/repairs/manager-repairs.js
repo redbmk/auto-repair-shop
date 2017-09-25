@@ -4,6 +4,13 @@ import PropTypes from 'prop-types';
 import firebase from '../../firebase';
 import RepairList from '../../components/repair-list';
 
+import { hourRange } from '../../moment';
+
+const mapBlockedTimes = repair => ({
+  key: repair.key,
+  range: hourRange(repair)
+});
+
 class ManagerRepairs extends Component {
   static propTypes = {
     currentUser: PropTypes.object.isRequired,
@@ -36,7 +43,13 @@ class ManagerRepairs extends Component {
   }
 
   render() {
-    return <RepairList {...this.props} repairs={this.state.repairs} />;
+    return (
+      <RepairList
+        {...this.props}
+        repairs={this.state.repairs}
+        blockedTimes={this.state.repairs.map(mapBlockedTimes)}
+      />
+    );
   }
 }
 

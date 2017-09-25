@@ -10,7 +10,7 @@ class UserSelect extends Component {
     users: PropTypes.array.isRequired,
     selected: PropTypes.object,
     onChange: PropTypes.func.isRequired,
-    emptyText: PropTypes.string,
+    emptyText: PropTypes.any,
   }
 
   get menuItems() {
