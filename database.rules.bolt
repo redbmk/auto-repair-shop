@@ -8,23 +8,20 @@ type User {
 }
 
 type Comment {
-  validate() { root.users[this.user].exists() }
-
   message: String,
   datetime: Number,
   user: String,
 }
 
 type Repair {
-  validate() { !this.user || root.users[this.user].exists() }
-
   title: String,
   description: String,
-  datetime: Number,
-  completed: Boolean,
-  approved: Boolean,
-  user: String,
-  comments: Comments[],
+  date: String,
+  time: String,
+  completed: Boolean | Null,
+  approved: Boolean | Null,
+  user: String | Null,
+  comments: Comment[] | Null,
 }
 
 path /users {
@@ -54,13 +51,12 @@ path /repairs {
   write() { isManager() }
 }
 
-path /repairs/{id} {
+path /repairs/{id} is Repair {
   read() { isManager() || isCurrentUser(this.user) }
 }
 
-path /repairs/{id}/comments {
-  create() { isManager() || isCurrentUser(this.parent().user) }
-  update() { isManager() || isCurrentUser(this.parent().user) }
+path /repairs/{id}/comments/{key2} is Comment {
+  create() { isManager() || isCurrentUser(root.repairs[id].user) }
 }
 
 path /repairs/{id}/completed {
