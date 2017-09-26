@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import { Div } from 'glamorous';
 
 import UserEdit from '../components/user-edit';
+import UserEditDialog from '../components/user-edit-dialog';
+import FAB from '../components/fab';
 
 import firebase from '../firebase';
 
@@ -13,6 +15,7 @@ class ManageUsers extends Component {
   }
 
   state = {
+    isEditorOpen: false,
     users: [],
   }
 
@@ -33,6 +36,9 @@ class ManageUsers extends Component {
     this.setState({ users });
   }
 
+  openEditor = () => this.setState({ isEditorOpen: true });
+  closeEditor = () => this.setState({ isEditorOpen: false });
+
   get users() {
     return this.state.users.map(user => (
       <UserEdit
@@ -47,6 +53,8 @@ class ManageUsers extends Component {
     return (
       <Div display="flex" justifyContent="space-between" flexWrap="wrap">
         {this.users}
+        <FAB onClick={this.openEditor}/>
+        <UserEditDialog open={this.state.isEditorOpen} onClose={this.closeEditor} />
       </Div>
     );
   }

@@ -161,7 +161,7 @@ class RepairEditDialog extends Component {
         actions={actions}
         open={this.props.open}
         modal={false}
-        onRequestClose={this.props.onRequestClose}
+        onRequestClose={this.props.onClose}
       >
         <TextField
           floatingLabelText="Title"

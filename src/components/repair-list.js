@@ -3,20 +3,10 @@ import PropTypes from 'prop-types';
 
 import { Div } from 'glamorous';
 
-import FloatingActionButton from 'material-ui/FloatingActionButton';
-import AddIcon from 'material-ui/svg-icons/content/add';
-
 import RepairEdit from './repair-edit';
 import RepairFilter from './repair-filter';
 import RepairEditDialog from './repair-edit-dialog';
-
-const styles = {
-  fab: {
-    position: 'fixed',
-    bottom: 40,
-    right: 40,
-  }
-};
+import FAB from './fab';
 
 const sortRepairs = (a, b) => {
   return a.date.localeCompare(b.date)
@@ -45,9 +35,7 @@ class RepairList extends Component {
 
     return (
       <div>
-        <FloatingActionButton secondary={true} style={styles.fab} onClick={this.openEditor}>
-          <AddIcon />
-        </FloatingActionButton>
+        <FAB onClick={this.openEditor} />
         <RepairEditDialog {...this.props}
           open={this.state.isEditorOpen}
           onClose={this.closeEditor}
