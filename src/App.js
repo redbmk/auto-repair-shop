@@ -13,6 +13,7 @@ import AppBarWithLinks from './components/app-bar-with-links';
 import SignIn from './pages/sign-in';
 import ManageUsers from './pages/manage-users';
 import Repairs from './pages/repairs';
+import RESTTest from './pages/rest-test';
 
 const Main = glamorous.main({
   padding: '20px',
@@ -92,6 +93,7 @@ class App extends Component {
           props={{currentUser: this.state.user}}
         />
         <RedirectableRoute redirect={requireUnauth} path="/sign-in" component={SignIn} />
+        <RedirectableRoute redirect={requireManager} path="/rest-test" component={RESTTest} />
         <Route render={() => <Redirect to="/" />} />
       </Switch>
     );
