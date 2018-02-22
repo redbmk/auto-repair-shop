@@ -32,8 +32,9 @@ class RepairEditDialog extends Component {
   get validatedRepair() {
     const repair = this.sanitizeRepair(this.state);
 
-    for (let value of Object.values(repair)) {
-      if (value === null || value === undefined) {
+    for (let key of Object.keys(repair)) {
+      const value = repair[key];
+      if (key !== 'key' && (value === null || value === undefined)) {
         return null;
       }
     }
